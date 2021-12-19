@@ -1,0 +1,18 @@
+FROM gradle:7.3.1-jdk17 AS builder
+COPY --chown=gradle:gradle . /home/gradle/src
+WORKDIR /home/gradle/src
+RUN gradle bootJar --no-daemon
+RUN echo "The proof is in the pudding" && ./gradlew dependencyInsight --dependency log4j-core
+
+FROM openjdk:8u181-jdk-alpine
+EXPOSE 8080
+RUN mkdir /app
+COPY --from=builder /home/gradle/src/build/libs/*.jar /app/spring-boot-application.jar
+RUN apk add zip && mkdir -p /tmp/jar-fix \
+    && unzip /app/spring-boot-application.jar -d /tmp/jar-fix \
+    && zip -q -d /tmp/jar-fix/BOOT-INF/lib/log4j-core-*.jar org/apache/logging/log4j/core/lookup/JndiLookup.class \
+    && jar -c0Mf /tmp/jar-fix/spring-boot-application.jar -C /tmp/jar-fix/ BOOT-INF/ -C /tmp/jar-fix/ META-INF/ -C /tmp/jar-fix/ org/ \
+    && cp /tmp/jar-fix/spring-boot-application.jar /app/spring-boot-application.jar \
+    && rm -rf /tmp/jar-fix \
+    && apk del zip
+CMD ["java", "-jar", "/app/spring-boot-application.jar"]
