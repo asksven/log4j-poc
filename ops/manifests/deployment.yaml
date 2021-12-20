@@ -8,13 +8,15 @@ spec:
   restartPolicy: Never
   containers:
   # Step 1: this version is based on 2.14.1 and is vulnerable to both ldap attack and DoS
-  - image: docker.io/asksven/l4-poc:2-14-1-1 
+  #- image: docker.io/asksven/l4-poc:2-14-1-1 
   # Step 2: this version is based on 2.16.0 and is neither vulnerable to ldap attack nor DoS
   #- image: docker.io/asksven/l4-poc:2-16-0-1
-  # Step 3: this version is based on 2.16.0 and is not vulnerable to ldap attack nor DoS, even with a "bad" PatternLayout
+  # Step 3: this version is based on 2.16.0 and is not vulnerable to ldap but to DoS (based on another repo)
   #- image: docker.io/asksven/l4-poc:2-16-0-2
-  # Step 34: this version is based on 2.17.0 and has JNDILookup removed. It is not vulnerable to ldap attack nor DoS, even with a "bad" PatternLayout
+  # Step 5: this version is based on 2.17.0 and has JNDILookup removed. It is not vulnerable to ldap attack nor DoS, even with a "bad" PatternLayout
   #- image: docker.io/asksven/l4-poc:2-17-0-1
+  # Step 6: same as step 5 but for the other repo
+  #- image: docker.io/asksven/l4-poc:2-17-0-2
     imagePullPolicy: Always
     name: vulnerable-app
     ports:
